@@ -149,6 +149,9 @@
 #elif defined (JD79686B_DRIVER)
      #include "TFT_Drivers/JD79686B_Defines.h"
      #define  TFT_DRIVER 0x7968
+#elif defined (JD79686AB_DRIVER)
+     #include "TFT_Drivers/JD79686AB_Defines.h"
+     #define  TFT_DRIVER 0x7969
 #elif defined (ED2208_DRIVER)
      #include "TFT_Drivers/ED2208_Defines.h"
      #define  TFT_DRIVER 0x2208

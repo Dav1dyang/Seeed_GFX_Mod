@@ -620,7 +620,9 @@ void TFT_eSPI::init(uint8_t tc)
 {
   if (_booted)
   {
-    initBus();
+#ifndef JD79686AB_DRIVER
+    initBus();  // Skip for bit-bang drivers
+#endif
 
 #if !defined (ESP32) && !defined(TFT_PARALLEL_8_BIT) && !defined(ARDUINO_ARCH_RP2040) && !defined (ARDUINO_ARCH_MBED) && !defined (EFR32MG24B220F1536IM48)
   // Legacy bitmasks for GPIO
@@ -697,7 +699,9 @@ void TFT_eSPI::init(uint8_t tc)
     }
   #endif
   if (TFT_RST >= 0) {
+#ifndef JD79686AB_DRIVER
     writecommand(0x00); // Put SPI bus in known state for TFT with CS tied low
+#endif
     digitalWrite(TFT_RST, HIGH);
     delay(5);
     digitalWrite(TFT_RST, LOW);
@@ -711,7 +715,9 @@ void TFT_eSPI::init(uint8_t tc)
 
   delay(150); // Wait for reset to complete
 
-  begin_tft_write();
+#ifndef JD79686AB_DRIVER
+  begin_tft_write();  // JD79686AB uses bit-bang SPI, skip hardware SPI init
+#endif
 
   tc = tc; // Suppress warning
 
@@ -795,6 +801,9 @@ void TFT_eSPI::init(uint8_t tc)
 #elif defined (JD79686B_DRIVER)
     #include "TFT_Drivers/JD79686B_Init.h"
 
+#elif defined (JD79686AB_DRIVER)
+    #include "TFT_Drivers/JD79686AB_Init.h"
+
 #elif defined (ED2208_DRIVER)
     #include "TFT_Drivers/ED2208_Init.h"
   
@@ -808,7 +817,9 @@ void TFT_eSPI::init(uint8_t tc)
   writecommand(TFT_INVOFF);
 #endif
 
-  end_tft_write();
+#ifndef JD79686AB_DRIVER
+  end_tft_write();  // JD79686AB uses bit-bang, no hardware SPI transaction
+#endif
 
   //setRotation(rotation);
 
@@ -919,7 +930,10 @@ void TFT_eSPI::setRotation(uint8_t m)
 
 #elif defined (JD79686B_DRIVER)
     #include "TFT_Drivers/JD79686B_Rotation.h"
-    
+
+#elif defined (JD79686AB_DRIVER)
+    #include "TFT_Drivers/JD79686AB_Rotation.h"
+
 #elif defined (ED2208_DRIVER)
     #include "TFT_Drivers/ED2208_Rotation.h"
 #endif
