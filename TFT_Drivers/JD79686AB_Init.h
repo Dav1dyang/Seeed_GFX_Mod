@@ -88,9 +88,15 @@
     delay(200);  // CRITICAL: 200ms delay before BUSY check
 
 #ifdef TFT_BUSY
-    while (!digitalRead(TFT_BUSY))
-        ;
-    delay(10);
+    {
+        unsigned long _busy_start = millis();
+        while (!digitalRead(TFT_BUSY)) {
+            if (millis() - _busy_start > 25000)
+                break;
+            delay(10);
+        }
+        delay(10);
+    }
 #endif
 
     #undef CMD_M

@@ -56,14 +56,18 @@
         }                                 \
     } while (0)
 
-// BUSY check
+// BUSY check with timeout (matches Waveshare ReadBusy)
 #ifdef TFT_BUSY
-#define CHECK_BUSY()                   \
-    do                                 \
-    {                                  \
-        while (!digitalRead(TFT_BUSY)) \
-            ;                          \
-        delay(10);                     \
+#define CHECK_BUSY()                              \
+    do                                            \
+    {                                             \
+        unsigned long _busy_start = millis();     \
+        while (!digitalRead(TFT_BUSY)) {          \
+            if (millis() - _busy_start > 25000)   \
+                break;                            \
+            delay(10);                            \
+        }                                         \
+        delay(10);                                \
     } while (0)
 #else
 #define CHECK_BUSY()
@@ -115,8 +119,162 @@
         delay(100);                         \
     } while (0)
 
-// EPD_WAKEUP - Not used (display stays initialized)
-#define EPD_WAKEUP()  do { } while (0)
+// EPD_WAKEUP - Re-initialize display after sleep (matches Waveshare Init)
+#define EPD_WAKEUP()                                                                    \
+    do                                                                                  \
+    {                                                                                   \
+        /* Hardware reset */                                                            \
+        digitalWrite(TFT_RST, HIGH);                                                    \
+        delay(20);                                                                      \
+        digitalWrite(TFT_RST, LOW);                                                     \
+        delay(10);                                                                      \
+        digitalWrite(TFT_RST, HIGH);                                                    \
+        delay(20);                                                                      \
+        /* Master IC register configuration */                                          \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0x4D); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x55); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0xA6); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x38); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0xB4); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x5D); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0xB6); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x80); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0xB7); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x00); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0xF7); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x02); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        /* Slave IC register configuration */                                           \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0x4D); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x55); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0xA6); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x38); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0xB4); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x5D); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0xB6); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x80); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0xB7); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x00); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0xF7); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x02); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        /* Slave-specific command */                                                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0xAE); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0xA0); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        /* Master panel settings */                                                     \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0xE0); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x01); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0x00); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x9F); SPI_BITBANG_WRITE(0x0D);                               \
+        digitalWrite(TFT_CS_PRIMARY, HIGH);                                             \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0x06); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x57); SPI_BITBANG_WRITE(0x24);                               \
+        SPI_BITBANG_WRITE(0x28); SPI_BITBANG_WRITE(0x32);                               \
+        SPI_BITBANG_WRITE(0x08); SPI_BITBANG_WRITE(0x48);                               \
+        digitalWrite(TFT_CS_PRIMARY, HIGH);                                             \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0x61); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x02); SPI_BITBANG_WRITE(0xA8);                               \
+        SPI_BITBANG_WRITE(0x01); SPI_BITBANG_WRITE(0xE0);                               \
+        digitalWrite(TFT_CS_PRIMARY, HIGH);                                             \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0x62); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x00); SPI_BITBANG_WRITE(0x00);                               \
+        SPI_BITBANG_WRITE(0x00); SPI_BITBANG_WRITE(0x00);                               \
+        digitalWrite(TFT_CS_PRIMARY, HIGH);                                             \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0x60); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x31); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0x50); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x97); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0xE8); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_PRIMARY, LOW);                  \
+        SPI_BITBANG_WRITE(0x01); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        /* Slave panel settings */                                                      \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0xE0); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x01); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0x00); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x9F); SPI_BITBANG_WRITE(0x0D);                               \
+        digitalWrite(TFT_CS_SECONDARY, HIGH);                                           \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0x06); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x57); SPI_BITBANG_WRITE(0x24);                               \
+        SPI_BITBANG_WRITE(0x28); SPI_BITBANG_WRITE(0x32);                               \
+        SPI_BITBANG_WRITE(0x08); SPI_BITBANG_WRITE(0x48);                               \
+        digitalWrite(TFT_CS_SECONDARY, HIGH);                                           \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0x61); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x02); SPI_BITBANG_WRITE(0xA8);                               \
+        SPI_BITBANG_WRITE(0x01); SPI_BITBANG_WRITE(0xE0);                               \
+        digitalWrite(TFT_CS_SECONDARY, HIGH);                                           \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0x62); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x00); SPI_BITBANG_WRITE(0x00);                               \
+        SPI_BITBANG_WRITE(0x00); SPI_BITBANG_WRITE(0x00);                               \
+        digitalWrite(TFT_CS_SECONDARY, HIGH);                                           \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0x60); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x31); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0x50); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x97); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0xE8); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        digitalWrite(TFT_DC, HIGH); digitalWrite(TFT_CS_SECONDARY, LOW);                \
+        SPI_BITBANG_WRITE(0x01); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        /* Power ON both ICs */                                                         \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_PRIMARY, LOW);                   \
+        SPI_BITBANG_WRITE(0x04); digitalWrite(TFT_CS_PRIMARY, HIGH);                    \
+        digitalWrite(TFT_DC, LOW); digitalWrite(TFT_CS_SECONDARY, LOW);                 \
+        SPI_BITBANG_WRITE(0x04); digitalWrite(TFT_CS_SECONDARY, HIGH);                  \
+        delay(200);                                                                     \
+        CHECK_BUSY();                                                                   \
+    } while (0)
 
 // EPD_SET_WINDOW - Not used for full refresh
 #define EPD_SET_WINDOW(x1, y1, x2, y2)  do { } while (0)
