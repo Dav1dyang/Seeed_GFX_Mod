@@ -2,10 +2,10 @@
  * Setup511: Waveshare 10.85" e-Paper Display
  *
  * Display: Waveshare 10.85" (1360×480) with dual JD79686AB ICs
- * Board: Seeed XIAO ESP32S3 + Seeed XIAO ePaper Driver Board
+ * Board: Seeed XIAO ESP32S3/ESP32C6 + Seeed XIAO ePaper Driver Board
  *
  * HARDWARE MODIFICATION REQUIRED:
- * Connect display pin 1 (CSB_S) directly to D7 on XIAO ESP32S3
+ * Connect display pin 1 (CSB_S) directly to D7 on XIAO
  *
  * Schematic Pin Reference:
  * - Primary IC CS:   CSB_M (display pin 12) → D1 via driver board
@@ -47,6 +47,9 @@
 
 // SPI Frequency (not used for bit-bang, but required by library)
 #if defined(ARDUINO_XIAO_ESP32S3) || defined(ARDUINO_XIAO_ESP32S3_PLUS)
+#define SPI_FREQUENCY 10000000
+#define SPI_READ_FREQUENCY 4000000
+#elif defined(ARDUINO_XIAO_ESP32C6)
 #define SPI_FREQUENCY 10000000
 #define SPI_READ_FREQUENCY 4000000
 #else

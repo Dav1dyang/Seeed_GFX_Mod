@@ -20,7 +20,7 @@
 #include "hal/gpio_ll.h"
 
 
-#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S2) && !defined(CONFIG_IDF_TARGET_ESP32)  && !defined(CONFIG_IDF_TARGET_ESP32c6)
+#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S2) && !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C6)
   #define CONFIG_IDF_TARGET_ESP32
 #endif
 
@@ -35,7 +35,7 @@
 
 // Fix IDF problems with ESP32C3
 //#if CONFIG_IDF_TARGET_ESP32C3
-#if CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32C6	
+#if defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6)
   /*
   // Fix ESP32C3 IDF bug for missing definition (VSPI/FSPI only tested at the moment)
   #ifndef REG_SPI_BASE

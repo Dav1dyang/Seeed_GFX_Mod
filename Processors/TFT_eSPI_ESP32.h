@@ -13,12 +13,12 @@
 #include "driver/spi_master.h"
 #include "hal/gpio_ll.h"
 
-#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S2) && !defined(CONFIG_IDF_TARGET_ESP32)
+#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S2) && !defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C6)
   #define CONFIG_IDF_TARGET_ESP32
 #endif
 
 // Fix IDF problems with ESP32C3
-#if CONFIG_IDF_TARGET_ESP32C3
+#if defined(CONFIG_IDF_TARGET_ESP32C3)
   // Fix ESP32C3 IDF bug for missing definition
   #ifndef REG_SPI_BASE
     #define REG_SPI_BASE(i)     (DR_REG_SPI1_BASE + (((i)>1) ? (((i)* 0x1000) + 0x20000) : (((~(i)) & 1)* 0x1000 )))
@@ -322,7 +322,7 @@ SPI3_HOST = 2
       #define TFT_SCLK 18
     #endif
 
-    #if defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32S2)
+    #if defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C6)
       #if (TFT_MISO == -1)
         #undef TFT_MISO
         #define TFT_MISO TFT_MOSI
