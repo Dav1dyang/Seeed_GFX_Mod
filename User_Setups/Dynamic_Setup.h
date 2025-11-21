@@ -223,7 +223,9 @@
 #define ENABLE_EPAPER_BOARD_PIN_SETUPS
 #include <User_Setups/Setup509_Seeed_XIAO_EPaper_7inch3_colorful.h>    // Setup file for Seeed XIAO with 7.3inch RGB ePaper
 #elif BOARD_SCREEN_COMBO == 511
-#include <User_Setups/Setup511_Waveshare_10_85.h>    // Waveshare 10.85" ePaper (Dual JD79686AB)
+#include <User_Setups/Setup511_Waveshare_10_85.h>    // Waveshare 10.85" ePaper (Dual JD79686AB - Driver Board)
+#elif BOARD_SCREEN_COMBO == 512
+#include <User_Setups/Setup512_Waveshare_10_85_Breakout.h>    // Waveshare 10.85" ePaper (Dual JD79686AB - Breakout Board)
 #elif BOARD_SCREEN_COMBO == 520
 #define ENABLE_EPAPER_BOARD_PIN_SETUPS
 #include <User_Setups/Setup520_Seeed_reTerminal_E1001.h>
